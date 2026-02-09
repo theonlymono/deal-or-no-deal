@@ -5,6 +5,7 @@ import { MONEY_VALUES, ROUND_STRUCTURE, RISK_FACTORS, GameState } from '../lib/g
 import Board from '../components/Board';
 import Case from '../components/Case';
 import BankerPhone from '../components/BankerPhone';
+import GameRules from '@/components/GameRules';
 // import HeaderDocument from '@/components/HeaderDocument'; // Keep for reference
 import HeaderTicker from '@/components/HeaderTicker';
 import TickerMarquee from '@/components/TickerMarquee'; // <--- IMPORTED HERE
@@ -164,9 +165,24 @@ export default function Home() {
 
         {/* Center: Message & Cases */}
         <div className="flex-1 w-full max-w-4xl flex flex-col items-center">
-            {/* Status Bar */}
-            <div className="w-full bg-ink-black text-bloomberg-orange font-mono p-4 mb-6 text-center text-xl md:text-2xl border-b-4 border-bloomberg-orange shadow-retro">
-              {message}
+            {/* Status Bar - Style: "Clean Instruction" */}
+            <div className="w-full max-w-2xl mx-auto mb-8 relative">
+               {/* Background box with Retro Shadow */}
+               <div className="bg-paper-bg border-2 border-ink-black px-6 py-4 text-center shadow-[4px_4px_0px_rgba(26,26,26,0.15)]">
+                 
+                 {/* Decorative Corner Accents */}
+                 <div className="absolute top-1 left-1 w-2 h-2 border-t-2 border-l-2 border-ink-black opacity-50"></div>
+                 <div className="absolute top-1 right-1 w-2 h-2 border-t-2 border-r-2 border-ink-black opacity-50"></div>
+                 <div className="absolute bottom-1 left-1 w-2 h-2 border-b-2 border-l-2 border-ink-black opacity-50"></div>
+                 <div className="absolute bottom-1 right-1 w-2 h-2 border-b-2 border-r-2 border-ink-black opacity-50"></div>
+
+                 {/* The Message */}
+                 <p className="font-mono text-ink-black text-lg md:text-xl font-bold uppercase tracking-wider flex items-center justify-center gap-3">
+                   {/* Blinking cursor effect to keep the terminal vibe but subtle */}
+                   <span className="text-bloomberg-orange animate-pulse">►</span>
+                   {message}
+                 </p>
+               </div>
             </div>
 
             {/* My Case Area */}
@@ -218,6 +234,8 @@ export default function Home() {
         onDeal={handleDeal} 
         onNoDeal={handleNoDeal} 
       />
+
+      <GameRules />
       
       {/* Game Over Modal / Result Display */}
       {(gameState === 'GAME_OVER' || gameState === 'DEAL_ACCEPTED') && finalResult && (

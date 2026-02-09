@@ -1,36 +1,65 @@
-// components/HeaderTicker.tsx
+'use client';
+
 import React from 'react';
 
 const HeaderTicker = () => {
   return (
-    // CHANGED: mb-8 -> mb-0 (Removes the gap below)
-    <header className="w-full mb-0 relative z-30 bg-ink-black border-b-4 border-bloomberg-orange shadow-lg">
-      {/* Top thin line */}
-      <div className="w-full h-1 bg-grid-line opacity-20"></div>
+    <header className="w-full mb-0 relative z-30 bg-ink-black border-b-4 border-bloomberg-orange shadow-xl overflow-hidden">
+      
+      {/* Background Texture (Kept for vibe, but subtle) */}
+      <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:10px_10px]"></div>
 
-      <div className="max-w-6xl mx-auto py-3 px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* TOP META STRIP: Extremely compact now */}
+      <div className="relative w-full border-b border-paper-dark/20 flex justify-between px-4 text-[9px] font-mono text-paper-dark/50 tracking-widest uppercase py-0.5">
+         <span>SYS.VER.2005.12.19</span>
+         <span className="hidden md:inline">/// SECURE CONNECTION ///</span>
+         <span>UID: AG-3</span>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center relative">
         
-        {/* Left: The Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-3 h-3 bg-bloomberg-orange animate-pulse rounded-full"></div>
-          <h1 className="font-header text-3xl md:text-4xl text-paper-bg tracking-wider pt-1">
-            DEAL <span className="text-bloomberg-orange">OR</span> NO DEAL
-          </h1>
+        {/* LEFT: Branding & Serial */}
+        <div className="flex items-center gap-4">
+          
+          {/* Mini Barcode (Scaled down) */}
+          <div className="hidden md:flex h-6 gap-[2px] items-center opacity-60">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className={`h-full bg-paper-bg ${Math.random() > 0.5 ? 'w-0.5' : 'w-1'}`}></div>
+            ))}
+          </div>
+
+          {/* Main Title - Reduced Size */}
+          <div className="flex flex-col">
+             <div className="flex items-center gap-2">
+                <h1 className="font-header text-2xl md:text-4xl text-paper-bg tracking-wide leading-none">
+                  DEAL <span className="text-transparent bg-clip-text bg-gradient-to-t from-bloomberg-orange to-red-500 font-normal">OR</span> NO DEAL
+                </h1>
+                {/* Live Dot */}
+                <span className="w-1.5 h-1.5 bg-bloomberg-orange rounded-full animate-pulse mt-1"></span>
+             </div>
+          </div>
         </div>
 
-        {/* Right: Live Status Ticker */}
-        <div className="flex items-center gap-6 font-mono text-xs text-paper-dark border-l border-paper-dark/30 pl-6">
+        {/* RIGHT: Compact Dashboard */}
+        <div className="flex items-center gap-4 border-l border-paper-dark/20 pl-4">
           
-          
-          <div className="hidden md:flex flex-col">
-            <span className="text-grid-line uppercase text-[10px]">System Date</span>
-            <span>2005-12-19</span>
+          {/* Data Block: Banker Status (Condensed) */}
+          <div className="flex flex-col items-end">
+            <div className="flex items-center gap-1.5">
+               <span className="hidden sm:inline text-[9px] text-grid-line font-mono uppercase tracking-widest">Banker Line</span>
+               {/* Tiny Signal Bars */}
+               <div className="flex gap-[1px] items-end h-3">
+                  <div className="w-0.5 h-1.5 bg-bloomberg-orange animate-pulse"></div>
+                  <div className="w-0.5 h-2 bg-bloomberg-orange animate-pulse delay-75"></div>
+                  <div className="w-0.5 h-3 bg-bloomberg-orange animate-pulse delay-150"></div>
+               </div>
+            </div>
+            
+            <span className="font-mono text-bloomberg-orange font-bold tracking-widest text-xs md:text-sm animate-pulse">
+               WAITING...
+            </span>
           </div>
 
-          <div className="flex flex-col text-right">
-             <span className="text-grid-line uppercase text-[10px]">Banker Conn.</span>
-             <span className="text-bloomberg-orange animate-pulse">WAITING...</span>
-          </div>
         </div>
 
       </div>

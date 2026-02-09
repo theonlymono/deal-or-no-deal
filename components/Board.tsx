@@ -9,59 +9,97 @@ interface BoardProps {
 }
 
 const formatValue = (val: number) => {
-  return val.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  // Remove cents for cleaner look on board, unless it's < $1
+  const digits = val < 1 ? 2 : 0;
+  return val.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits });
 };
 
-const ValueRow = ({ value, isEliminated }: { value: number, isEliminated: boolean }) => {
+const MoneyRow = ({ value, isEliminated }: { value: number, isEliminated: boolean }) => {
+  
+  // Unified Styles: Both sides now use the "Paper Ledger" look
+  let containerClass = "border-b border-r border-ink-black/20"; // Default eliminated style
+  let textClass = "text-grid-line opacity-30 font-normal scale-95 blur-[0.5px]";
+  let bgClass = "bg-transparent";
+
+  if (!isEliminated) {
+    // Active State (Applied to BOTH Low and High now)
+    containerClass = "border-2 border-ink-black shadow-[2px_2px_0px_rgba(0,0,0,0.1)] translate-x-[-2px]";
+    bgClass = "bg-[#D4CDC0]"; // The 'paper-dark' shade you liked
+    textClass = "text-ink-black font-bold";
+  }
+
   return (
     <div
       className={`
-        flex items-end justify-between 
-        px-3 py-1 my-1
-        border-b border-grid-line
+        relative flex items-center justify-between 
+        px-3 py-1 mb-1.5
         font-mono text-sm md:text-base lg:text-lg text-right
-        tracking-tighter
-        transition-colors duration-300
-        ${isEliminated ? 'bg-transparent text-gray-400 line-through opacity-40' : 'bg-paper-bg text-bloomberg-orange font-bold'}
+        transition-all duration-500 ease-out
+        ${containerClass} ${bgClass}
       `}
     >
-      <span className="w-full">{formatValue(value)}</span>
+      {/* The Value */}
+      <span className={`w-full ${textClass}`}>
+        {formatValue(value)}
+      </span>
+
+      {/* Eliminated "X" Marker */}
+      {isEliminated && (
+        <span className="absolute left-2 text-ink-black/20 text-xs font-bold">---</span>
+      )}
     </div>
   );
 };
 
 const Board: React.FC<BoardProps> = ({ eliminatedValues, side = 'both' }) => {
-  const lowValues = MONEY_VALUES.slice(0, 13); // 0.01 - 750
-  const highValues = MONEY_VALUES.slice(13);   // 1000 - 1,000,000
+  const lowValues = MONEY_VALUES.slice(0, 13); 
+  const highValues = MONEY_VALUES.slice(13);
+
+  // Wrapper for columns
+  const ColumnWrapper = ({ title, children, align }: { title: string, children: React.ReactNode, align: 'left' | 'right' }) => (
+    <div className={`flex flex-col w-36 md:w-44 lg:w-48 ${align === 'right' ? 'items-end' : 'items-start'}`}>
+      
+      {/* Header Badge */}
+      <div className={`
+        mb-2 px-3 py-0.5 text-xs font-mono uppercase tracking-[0.2em] border border-ink-black
+        ${title === 'HIGH' ? 'bg-bloomberg-orange text-ink-black font-bold' : 'bg-transparent text-ink-black'}
+      `}>
+        {title} Inputs
+      </div>
+
+      <div className="w-full">
+        {children}
+      </div>
+    </div>
+  );
 
   return (
-    <div className={`flex w-full ${side === 'both' ? 'justify-between gap-4' : 'justify-center'} items-start h-full`}>
-      {/* Left Column (Low Values) */}
+    <div className={`flex w-full ${side === 'both' ? 'justify-between gap-2 md:gap-8' : 'justify-center'} items-start`}>
+      
+      {/* Left Column (Low) */}
       {(side === 'left' || side === 'both') && (
-        <div className="flex flex-col w-32 md:w-40 bg-paper-bg border border-ink-black shadow-retro p-2">
-            <h3 className="font-header text-center text-ink-black underline decoration-bloomberg-orange mb-2">LOW</h3>
+        <ColumnWrapper title="LOW" align="left">
           {lowValues.map((val) => (
-            <ValueRow
+            <MoneyRow
               key={val}
               value={val}
               isEliminated={eliminatedValues.includes(val)}
             />
           ))}
-        </div>
+        </ColumnWrapper>
       )}
 
-      {/* Right Column (High Values) */}
+      {/* Right Column (High) */}
       {(side === 'right' || side === 'both') && (
-        <div className="flex flex-col w-32 md:w-40 bg-paper-bg border border-ink-black shadow-retro p-2">
-            <h3 className="font-header text-center text-ink-black underline decoration-bloomberg-orange mb-2">HIGH</h3>
+        <ColumnWrapper title="HIGH" align="right">
           {highValues.map((val) => (
-            <ValueRow
+            <MoneyRow
               key={val}
               value={val}
               isEliminated={eliminatedValues.includes(val)}
             />
           ))}
-        </div>
+        </ColumnWrapper>
       )}
     </div>
   );

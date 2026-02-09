@@ -10,55 +10,80 @@ interface BankerPhoneProps {
 }
 
 const BankerPhone: React.FC<BankerPhoneProps> = ({ isOpen, offer, onDeal, onNoDeal }) => {
+  if (!isOpen) return null;
+
   return (
-    <div 
-      className={`
-        fixed bottom-0 left-0 right-0 
-        transform transition-transform duration-500 ease-in-out
-        ${isOpen ? 'translate-y-0' : 'translate-y-full'}
-        bg-paper-dark border-t-4 border-bloomberg-orange
-        shadow-[0_-5px_20px_rgba(0,0,0,0.2)]
-        z-50 p-6 md:p-8
-        flex flex-col items-center justify-center
-      `}
-    >
-      <div className="w-full max-w-2xl text-center">
-        <h2 className="text-2xl font-header text-ink-black mb-2 animate-pulse">
-          INCOMING OFFER - BANKER
-        </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      
+      {/* 1. Backdrop (Clean Blur) */}
+      <div className="absolute inset-0 bg-ink-black/60 backdrop-blur-sm animate-in fade-in duration-300"></div>
+
+      {/* 2. The "Bank Draft" Modal */}
+      <div className="relative w-full max-w-lg bg-paper-bg border-4 border-ink-black shadow-[10px_10px_0px_rgba(0,0,0,0.2)] animate-in zoom-in-95 duration-300">
         
-        <div className="text-4xl md:text-6xl font-mono text-bloomberg-orange font-bold my-4">
-          ${offer.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+        {/* Decorative 'Paper Clip' Visual (Top Center) */}
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 border-4 border-grid-line rounded-t-full bg-paper-dark z-0"></div>
+
+        {/* Header Strip */}
+        <div className="bg-ink-black py-3 px-6 relative z-10 flex justify-between items-center">
+          <span className="font-mono text-paper-bg text-xs tracking-[0.2em] uppercase">
+            Official Correspondence
+          </span>
+          <span className="w-2 h-2 bg-bloomberg-orange rounded-full animate-pulse"></span>
         </div>
 
-        <div className="flex gap-4 justify-center mt-6">
-          <button
-            onClick={onDeal}
-            className="
-              px-8 py-4 
-              bg-ink-black text-paper-bg 
-              hover:bg-bloomberg-orange hover:text-ink-black
-              border-2 border-ink-black
-              font-header text-2xl uppercase tracking-wider
-              transition-all duration-200
-            "
-          >
-            Deal
-          </button>
+        {/* Content Body */}
+        <div className="p-8 md:p-10 flex flex-col items-center text-center relative overflow-hidden">
           
-          <button
-            onClick={onNoDeal}
-            className="
-              px-8 py-4 
-              bg-paper-bg text-ink-black 
-              hover:bg-paper-dark
-              border-2 border-ink-black
-              font-header text-2xl uppercase tracking-wider
-              transition-all duration-200
-            "
-          >
-            No Deal
-          </button>
+          {/* Background Watermark */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] font-header text-ink-black/5 pointer-events-none select-none rotate-[-10deg]">
+            ?
+          </div>
+
+          <h2 className="font-header text-3xl md:text-4xl text-ink-black mb-1 uppercase tracking-wide">
+            Banker's Offer
+          </h2>
+          <div className="w-24 h-1 bg-bloomberg-orange mb-8"></div>
+
+          {/* The Offer Amount - Styled like a typed check */}
+          <div className="relative w-full bg-white border-2 border-dashed border-ink-black/30 p-6 mb-8">
+            <span className="absolute -top-3 left-4 bg-paper-bg px-2 text-xs font-mono text-grid-line uppercase">
+              Net Amount
+            </span>
+            
+            <div className="font-mono text-5xl md:text-6xl font-bold text-ink-black tracking-tighter">
+              ${offer.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-4 w-full font-header">
+            
+            {/* DEAL: Solid Black */}
+            <button
+              onClick={onDeal}
+              className="flex-1 bg-ink-black text-bloomberg-orange py-4 text-2xl uppercase tracking-widest border-2 border-ink-black hover:bg-bloomberg-orange hover:text-ink-black transition-colors"
+            >
+              Deal
+            </button>
+
+            {/* NO DEAL: Outline */}
+            <button
+              onClick={onNoDeal}
+              className="flex-1 bg-transparent text-ink-black py-4 text-2xl uppercase tracking-widest border-2 border-ink-black hover:bg-ink-black hover:text-paper-bg transition-colors"
+            >
+              No Deal
+            </button>
+            
+          </div>
+
+          {/* Footer Code */}
+          <div className="mt-6 flex gap-4 text-[10px] font-mono text-grid-line uppercase tracking-widest">
+            <span>Ref: B-{Math.floor(Math.random() * 9999)}</span>
+            <span>//</span>
+            <span>Auth: BANKER</span>
+          </div>
+
         </div>
       </div>
     </div>
