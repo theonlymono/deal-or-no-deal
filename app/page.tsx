@@ -1,65 +1,258 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { MONEY_VALUES, ROUND_STRUCTURE, RISK_FACTORS, GameState } from '../lib/gameConstants';
+import Board from '../components/Board';
+import Case from '../components/Case';
+import BankerPhone from '../components/BankerPhone';
+// import HeaderDocument from '@/components/HeaderDocument'; // Keep for reference
+import HeaderTicker from '@/components/HeaderTicker';
+import TickerMarquee from '@/components/TickerMarquee'; // <--- IMPORTED HERE
+
+// Helper to shuffle array
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
+interface CaseData {
+  id: number;
+  value: number;
+  isOpen: boolean;
+}
 
 export default function Home() {
+  const [cases, setCases] = useState<CaseData[]>([]);
+  const [myCaseId, setMyCaseId] = useState<number | null>(null);
+  const [gameState, setGameState] = useState<GameState>('PICK_CASE');
+  const [round, setRound] = useState(1);
+  const [casesToOpenInRound, setCasesToOpenInRound] = useState(6);
+  const [eliminatedValues, setEliminatedValues] = useState<number[]>([]);
+  const [bankerOffer, setBankerOffer] = useState(0);
+  const [message, setMessage] = useState("Select your case to keep.");
+  const [finalResult, setFinalResult] = useState<{ winAmount: number; source: 'DEAL' | 'CASE' } | null>(null);
+
+  // Initialize Game
+  useEffect(() => {
+    initGame();
+  }, []);
+
+  const initGame = () => {
+    const shuffledValues = shuffleArray(MONEY_VALUES);
+    const initialCases = shuffledValues.map((value, index) => ({
+      id: index + 1,
+      value: value,
+      isOpen: false,
+    }));
+    setCases(initialCases);
+    setMyCaseId(null);
+    setGameState('PICK_CASE');
+    setRound(1);
+    setCasesToOpenInRound(ROUND_STRUCTURE[0].casesToOpen);
+    setEliminatedValues([]);
+    setBankerOffer(0);
+    setMessage("Select your case to keep.");
+    setFinalResult(null);
+  };
+
+  const calculateOffer = (currentEliminated: number[], currentRound: number) => {
+    const remainingValues = MONEY_VALUES.filter(v => !currentEliminated.includes(v));
+    const total = remainingValues.reduce((sum, val) => sum + val, 0);
+    const expectedValue = total / remainingValues.length;
+    const riskFactor = RISK_FACTORS[currentRound] || 0.95;
+    return Math.floor(expectedValue * riskFactor);
+  };
+
+  const handleCaseClick = (id: number) => {
+    if (gameState === 'PICK_CASE') {
+      setMyCaseId(id);
+      setGameState('OPEN_CASES');
+      setMessage(`Open ${casesToOpenInRound} case${casesToOpenInRound > 1 ? 's' : ''} to reveal values.`);
+    } else if (gameState === 'OPEN_CASES') {
+      if (id === myCaseId || cases.find(c => c.id === id)?.isOpen) return;
+
+      const selectedCase = cases.find(c => c.id === id);
+      if (!selectedCase) return;
+
+      // Open the case
+      const updatedCases = cases.map(c => 
+        c.id === id ? { ...c, isOpen: true } : c
+      );
+      setCases(updatedCases);
+
+      // Add to eliminated values
+      const newEliminated = [...eliminatedValues, selectedCase.value];
+      setEliminatedValues(newEliminated);
+
+      // Decrement remaining cases to open
+      const remaining = casesToOpenInRound - 1;
+      setCasesToOpenInRound(remaining);
+
+      if (remaining === 0) {
+        // Round Over, Banker Calls
+        const offer = calculateOffer(newEliminated, round);
+        setBankerOffer(offer);
+        setGameState('BANKER_OFFER');
+        setMessage("The Banker is calling...");
+      } else {
+        setMessage(`Open ${remaining} case${remaining > 1 ? 's' : ''} to reveal values.`);
+      }
+    }
+  };
+
+  const handleDeal = () => {
+    setFinalResult({ winAmount: bankerOffer, source: 'DEAL' });
+    setGameState('DEAL_ACCEPTED');
+    setMessage(`DEAL ACCEPTED! You won $${bankerOffer.toLocaleString()}`);
+  };
+
+  const handleNoDeal = () => {
+    // Check if it was the last round (2 cases left: 26 total - 24 eliminated = 2 remaining)
+    const totalEliminated = eliminatedValues.length;
+    const remainingCases = 26 - totalEliminated;
+    // myCase is NOT opened.
+    
+    if (remainingCases <= 2) {
+       // Game Over, Reveal My Case
+       const myCase = cases.find(c => c.id === myCaseId);
+       if (myCase) {
+         setFinalResult({ winAmount: myCase.value, source: 'CASE' });
+         setGameState('GAME_OVER');
+         setMessage(`GAME OVER! Your case contained $${myCase.value.toLocaleString()}`);
+         // Reveal my case
+         setCases(prev => prev.map(c => c.id === myCaseId ? { ...c, isOpen: true } : c));
+       }
+    } else {
+      // Next Round
+      const nextRound = round + 1;
+      const nextRoundStructure = ROUND_STRUCTURE.find(r => r.round === nextRound);
+      
+      if (nextRoundStructure) {
+        setRound(nextRound);
+        setCasesToOpenInRound(nextRoundStructure.casesToOpen);
+        setGameState('OPEN_CASES');
+        setMessage(`Round ${nextRound}: Open ${nextRoundStructure.casesToOpen} cases.`);
+      } else {
+         // Fallback if structure ends (shouldn't happen with correct constants)
+         setGameState('GAME_OVER');
+      }
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-paper-bg grid-bg relative overflow-hidden flex flex-col items-center pb-6">
+      {/* Visual Effects */}
+      <div className="crt-flicker pointer-events-none fixed inset-0 z-50 opacity-[0.02]"></div>
+      
+      {/* Header */}
+      <HeaderTicker />
+      
+      {/* Marquee Ticker - Added Here */}
+      <TickerMarquee />
+
+      {/* Main Game Area */}
+      <div className="flex flex-col xl:flex-row w-full max-w-7xl items-start justify-center gap-6 z-10 mb-20 md:mb-0 px-4 mt-6">
+        
+        {/* Left Board (Low Values) - Hidden on Mobile */}
+        <div className="hidden xl:block w-48 sticky top-4">
+           <Board eliminatedValues={eliminatedValues} side="left" />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Center: Message & Cases */}
+        <div className="flex-1 w-full max-w-4xl flex flex-col items-center">
+            {/* Status Bar */}
+            <div className="w-full bg-ink-black text-bloomberg-orange font-mono p-4 mb-6 text-center text-xl md:text-2xl border-b-4 border-bloomberg-orange shadow-retro">
+              {message}
+            </div>
+
+            {/* My Case Area */}
+            {myCaseId && (
+              <div className="mb-8 flex flex-col items-center animate-bounce-slow">
+                <span className="font-header text-ink-black mb-2 tracking-widest bg-paper-dark px-2">YOUR CASE</span>
+                <Case 
+                  id={myCaseId} 
+                  isOpen={cases.find(c => c.id === myCaseId)?.isOpen || false}
+                  value={cases.find(c => c.id === myCaseId)?.value}
+                  onClick={() => {}} // Can't click my case until end
+                  disabled={true}
+                  isMyCase={true}
+                />
+              </div>
+            )}
+
+            {/* Cases Grid */}
+            {/* UPDATED: Tighter gap, more columns on large screens */}
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-6 gap-2 md:gap-3 justify-center w-full max-w-3xl mx-auto">
+              {cases.filter(c => c.id !== myCaseId).map((c) => (
+                <Case 
+                  key={c.id} 
+                  id={c.id} 
+                  isOpen={c.isOpen}
+                  value={c.value}
+                  onClick={() => handleCaseClick(c.id)}
+                  disabled={gameState !== 'PICK_CASE' && gameState !== 'OPEN_CASES'}
+                  isMyCase={false}
+                />
+              ))}
+            </div>
         </div>
-      </main>
-    </div>
+
+        {/* Right Board (High Values) - Hidden on Mobile */}
+        <div className="hidden xl:block w-48 sticky top-4">
+             <Board eliminatedValues={eliminatedValues} side="right" />
+        </div>
+
+        {/* Mobile Board (Both Columns at Bottom) */}
+        <div className="w-full xl:hidden mt-8 pb-20">
+             <Board eliminatedValues={eliminatedValues} side="both" />
+        </div>
+      </div>
+
+      <BankerPhone 
+        isOpen={gameState === 'BANKER_OFFER'} 
+        offer={bankerOffer} 
+        onDeal={handleDeal} 
+        onNoDeal={handleNoDeal} 
+      />
+      
+      {/* Game Over Modal / Result Display */}
+      {(gameState === 'GAME_OVER' || gameState === 'DEAL_ACCEPTED') && finalResult && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4">
+          <div className="bg-paper-bg p-8 border-4 border-bloomberg-orange max-w-lg w-full text-center shadow-2xl relative animate-in fade-in zoom-in duration-300">
+             <h2 className="text-4xl font-header text-ink-black mb-4 underline decoration-wavy decoration-bloomberg-orange">
+               {gameState === 'DEAL_ACCEPTED' ? 'DEAL MADE' : 'GAME OVER'}
+             </h2>
+             
+             <div className="my-8 bg-ink-black p-4 rotate-1 shadow-lg">
+                <p className="font-mono text-paper-bg text-lg mb-1">YOU WON</p>
+                <div className="text-bloomberg-orange font-bold text-4xl md:text-5xl font-mono">
+                  ${finalResult.winAmount.toLocaleString()}
+                </div>
+             </div>
+             
+             {gameState === 'DEAL_ACCEPTED' && myCaseId && (
+               <div className="mb-6 p-4 border-2 border-dashed border-ink-black/20">
+                 <p className="text-sm text-ink-black mb-2 font-bold uppercase tracking-widest">Your Case Contained</p>
+                 <div className="text-2xl font-mono text-ink-black font-bold">
+                   ${cases.find(c => c.id === myCaseId)?.value.toLocaleString()}
+                 </div>
+               </div>
+             )}
+
+             <button 
+               onClick={initGame}
+               className="w-full bg-ink-black text-paper-bg px-6 py-4 font-header text-2xl hover:bg-bloomberg-orange hover:text-ink-black transition-colors border-2 border-transparent hover:border-ink-black uppercase tracking-widest"
+             >
+               PLAY AGAIN
+             </button>
+          </div>
+        </div>
+      )}
+
+    </main>
   );
 }
