@@ -1,7 +1,5 @@
 # Game Theory Terminal: Deal or No Deal
 
-**Author:** Htet Myet Zaw (University of Information Technology, Yangon)
-
 ## Abstract
 
 This project transforms the television game show "Deal or No Deal" into a rigorous mathematical dashboard for analyzing decision-making under uncertainty. The system serves as an advanced analytical engine for 1-player games against nature, implementing multiple Game Theory models based on Philip D. Straffin's "Game Theory and Strategy". Through real-time processing of board states and Banker offers, the application provides quantitative insights into risk aversion, regret minimization, and theoretical outcome bounds, presenting complex mathematical analysis through a brutalist "Retro Financial Dashboard" interface reminiscent of Bloomberg Terminal aesthetics.
