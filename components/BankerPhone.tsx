@@ -84,6 +84,26 @@ const BankerPhone: React.FC<BankerPhoneProps> = ({ isOpen, offer, onDeal, onNoDe
             <span>Auth: BANKER</span>
           </div>
 
+          {/* Scroll Down Indicator */}
+          <div className="mt-6 flex flex-col items-center animate-bounce">
+            <span className="text-xs font-mono text-bloomberg-orange uppercase tracking-widest mb-1">
+              Scroll down for Analysis
+            </span>
+            <svg 
+              className="w-5 h-5 text-bloomberg-orange" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+              />
+            </svg>
+          </div>
+
         </div>
       </div>
     </div>

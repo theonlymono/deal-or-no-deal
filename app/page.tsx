@@ -6,6 +6,7 @@ import Board from '../components/Board';
 import Case from '../components/Case';
 import BankerPhone from '../components/BankerPhone';
 import GameRules from '@/components/GameRules';
+import GameTheoryTerminal from '@/components/GameTheoryTerminal';
 // import HeaderDocument from '@/components/HeaderDocument'; // Keep for reference
 import HeaderTicker from '@/components/HeaderTicker';
 import TickerMarquee from '@/components/TickerMarquee'; // <--- IMPORTED HERE
@@ -249,6 +250,17 @@ export default function Home() {
         onNoDeal={handleNoDeal} 
       />
 
+      {/* Game Theory Analysis - Live Terminal */}
+      {/* ဤနေရာတွင် ပြင်ဆင်ထားသည်: Banker ဖုန်းဆက်ချိန်တွင် Terminal ကို Modal ၏ အပေါ်သို့ ဆွဲတင်ရန် z-[70] ကို အသုံးပြုထားသည် */}
+      {gameState !== 'PICK_CASE' && (
+        <div className={`w-full transition-all duration-500 ${gameState === 'BANKER_OFFER' ? 'relative z-[70]' : 'relative z-10'}`}>
+          <GameTheoryTerminal 
+            remainingValues={MONEY_VALUES.filter(v => !eliminatedValues.includes(v))}
+            bankerOffer={gameState === 'BANKER_OFFER' ? bankerOffer : null}
+          />
+        </div>
+      )}
+
       <GameRules />
       
       {/* Game Over Modal / Result Display */}
@@ -256,11 +268,11 @@ export default function Home() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4">
           <div className="bg-paper-bg p-8 border-4 border-bloomberg-orange max-w-lg w-full text-center shadow-2xl relative animate-in fade-in zoom-in duration-300">
              <h2 className="text-4xl font-header text-ink-black mb-4 underline decoration-wavy decoration-bloomberg-orange">
-               {gameState === 'DEAL_ACCEPTED' ? 'DEAL MADE' : 'GAME OVER'}
+               {gameState === 'DEAL_ACCEPTED' ? 'DEAL MADE' : 'ROUND COMPLETE'}
              </h2>
              
              <div className="my-8 bg-ink-black p-4 rotate-1 shadow-lg">
-                <p className="font-mono text-paper-bg text-lg mb-1">YOU WON</p>
+                <p className="font-mono text-paper-bg text-lg mb-1">FINAL AMOUNT</p>
                 <div className="text-bloomberg-orange font-bold text-4xl md:text-5xl font-mono">
                   ${finalResult.winAmount.toLocaleString()}
                 </div>
