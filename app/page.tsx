@@ -7,9 +7,9 @@ import Case from '../components/Case';
 import BankerPhone from '../components/BankerPhone';
 import GameRules from '@/components/GameRules';
 import GameTheoryTerminal from '@/components/GameTheoryTerminal';
-// import HeaderDocument from '@/components/HeaderDocument'; // Keep for reference
 import HeaderTicker from '@/components/HeaderTicker';
-import TickerMarquee from '@/components/TickerMarquee'; // <--- IMPORTED HERE
+import TickerMarquee from '@/components/TickerMarquee';
+import HostDialogue from '@/components/HostDialogue';
 
 interface CaseData {
   id: number;
@@ -26,6 +26,7 @@ export default function Home() {
   const [eliminatedValues, setEliminatedValues] = useState<number[]>([]);
   const [bankerOffer, setBankerOffer] = useState(0);
   const [message, setMessage] = useState("Select your case to keep.");
+  const [dialogueQueue, setDialogueQueue] = useState<string[]>([]);
   const [finalResult, setFinalResult] = useState<{ winAmount: number; source: 'DEAL' | 'CASE' } | null>(null);
 
   // Initialize Game
@@ -59,10 +60,62 @@ export default function Home() {
     setBankerOffer(0);
     setMessage("Select your case to keep.");
     setFinalResult(null);
+    // Trigger game start dialogue
+    setTimeout(() => {
+      triggerDialogue([
+        "ကြိုဆိုပါတယ်။ သင့်ရဲ့ ကံကြမ္မာကို ပြောင်းလဲပေးမယ့် ကစားပွဲကနေ စတင်လိုက်ရအောင်။",
+        "သေတ္တာ (၂၆) လုံးထဲက သင့်အတွက် အရေးအကြီးဆုံး တစ်လုံးကို အရင်ရွေးချယ်ပါ။"
+      ]);
+    }, 500);
+  };
+
+  const GOOD_OPEN_DIALOGUES = [
+  [
+    "အရမ်းကောင်းတယ်။ ဂဏန်းအသေးလေး ပယ်နိုင်ခဲ့ပြီ။",
+    "ဒီအတိုင်း ဆက်သွားရအောင်!"
+  ],
+  [
+    "အမိုက်စားပဲ! ဒေါ်လာအသေးတွေ ဖယ်နိုင်တာ Banker ကို ဖိအားပေးနိုင်တယ်။",
+    "နောက်တစ်လုံးလည်း ဒီလိုပဲ ဖြစ်ပါစေ!"
+  ],
+  [
+    "လှလိုက်တဲ့ ရွေးချယ်မှု! ကံတရားက သင့်ဘက်မှာ ရှိနေပုံရတယ်။",
+    "Game Theory အရဆိုရင် ဒါဟာ အကောင်းဆုံး အခြေအနေပဲ။"
+  ],
+  [
+    "ရှယ်ပဲဗျာ! အကြီးတွေ အကုန်ကျန်သေးတယ်။",
+    "Banker တော့ ချွေးပြန်နေလောက်ပြီ။ ဆက်ရွေးပါ။"
+  ]
+];
+
+const BAD_OPEN_DIALOGUES = [
+  [
+    "ဟာ... ဒေါ်လာအကြီးကြီး ပါသွားပြီဗျာ။",
+    "စိတ်လျှော့ပါ၊ ရှေ့ဆက်ပြီး သတိထားရွေးကြရအောင်။"
+  ],
+  [
+    "နှမြောစရာပဲ... ဒါပေမယ့် ပွဲက မပြီးသေးဘူးနော်။",
+    "မျှော်လင့်ချက် မဖြတ်ပါနဲ့ဦး၊ ကျန်တဲ့ သေတ္တာတွေကို အာရုံစိုက်မယ်။"
+  ],
+  [
+    "အိုကေ... နည်းနည်းတော့ နာသွားတယ်။",
+    "Expected Value ကျသွားပေမယ့် သင့်သေတ္တာထဲမှာ အကြီးကြီး ပါနိုင်သေးတယ်။"
+  ],
+  [
+    "Banker ကတော့ ပြုံးနေလောက်ပြီ။",
+    "ဒါပေမယ့် သင့်ဆီမှာ အခွင့်အရေး ရှိပါသေးတယ်။ နောက်တစ်လုံး ရွေးလိုက်ပါ။"
+  ]
+];
+
+  const triggerDialogue = (lines: string[]) => {
+    setDialogueQueue(lines);
+  };
+
+  const handleDialogueComplete = () => {
+    setDialogueQueue([]);
   };
 
   const resetGame = () => {
-    // Helper to shuffle array (client-side only)
     const shuffleArray = <T,>(array: T[]): T[] => {
       const newArray = [...array];
       for (let i = newArray.length - 1; i > 0; i--) {
@@ -114,7 +167,21 @@ export default function Home() {
         setBankerOffer(offer);
         setGameState('BANKER_OFFER');
         setMessage("The Banker is calling...");
+        // Trigger banker offer dialogue
+        triggerDialogue([
+          "ခဏလေး... ဖုန်းဝင်လာတယ်။",
+          "Banker ဆီကပါ။ သူက သင့်ရဲ့ ရပ်တည်ချက်ကို စမ်းသပ်နေပြီ။",
+          "Game Theory Terminal ကို သေချာကြည့်ပြီး ဆုံးဖြတ်ပါ။"
+        ]);
       } else {
+        // Check if good or bad case opened (under $10,000 = good, $100,000+ = bad)
+        if (selectedCase.value < 10000) {
+          const randomIndex = Math.floor(Math.random() * GOOD_OPEN_DIALOGUES.length);
+          triggerDialogue(GOOD_OPEN_DIALOGUES[randomIndex]);
+        } else if (selectedCase.value >= 100000) {
+          const randomIndex = Math.floor(Math.random() * BAD_OPEN_DIALOGUES.length);
+          triggerDialogue(BAD_OPEN_DIALOGUES[randomIndex]);
+        }
         setMessage(`Open ${remaining} case${remaining > 1 ? 's' : ''} to reveal values.`);
       }
     }
@@ -124,6 +191,12 @@ export default function Home() {
     setFinalResult({ winAmount: bankerOffer, source: 'DEAL' });
     setGameState('DEAL_ACCEPTED');
     setMessage(`DEAL ACCEPTED! You won $${bankerOffer.toLocaleString()}`);
+    // Trigger deal accepted dialogue
+    triggerDialogue([
+      "ကွန်ဂရက်ကျူလေးရှင်း!",
+      "Banker ဆီကနေ အမြတ်ထုတ်နိုင်ခဲ့ပြီ။",
+      "ဒါပေမယ့် သင်ရွေးခဲ့တဲ့ သေတ္တာထဲမှာ ဘာပါလဲ ကြည့်လိုက်ရအောင်..."
+    ]);
   };
 
   const handleNoDeal = () => {
@@ -141,6 +214,11 @@ export default function Home() {
          setMessage(`GAME OVER! Your case contained $${myCase.value.toLocaleString()}`);
          // Reveal my case
          setCases(prev => prev.map(c => c.id === myCaseId ? { ...c, isOpen: true } : c));
+         // Trigger game over dialogue
+         triggerDialogue([
+           "ကစားပွဲ ပြီးဆုံးသွားပါပြီ။",
+           "သင့်ရဲ့ ကိုယ်ပိုင်သေတ္တာထဲက ငွေကတော့..."
+         ]);
        }
     } else {
       // Next Round
@@ -152,6 +230,11 @@ export default function Home() {
         setCasesToOpenInRound(nextRoundStructure.casesToOpen);
         setGameState('OPEN_CASES');
         setMessage(`Round ${nextRound}: Open ${nextRoundStructure.casesToOpen} cases.`);
+        // Trigger no deal dialogue
+        triggerDialogue([
+          "သတ္တိရှိတဲ့ ဆုံးဖြတ်ချက်ပဲ။",
+          "Banker ရဲ့ ငွေကို ငြင်းလိုက်ပြီ။ နောက်တစ်ဆင့် ဆက်သွားမယ်!"
+        ]);
       } else {
          // Fallback if structure ends (shouldn't happen with correct constants)
          setGameState('GAME_OVER');
@@ -168,10 +251,10 @@ export default function Home() {
       <HeaderTicker />
       
       {/* Marquee Ticker - Added Here */}
-      <TickerMarquee />
+      {/* <TickerMarquee /> */}
 
       {/* Main Game Area */}
-      <div className="flex flex-col xl:flex-row w-full max-w-7xl items-start justify-center gap-6 z-10 mb-20 md:mb-0 px-4 mt-6">
+      <div className="flex flex-col xl:flex-row w-full max-w-7xl items-start justify-center gap-6 z-10 mb-20 md:mb-0 px-4 mt-14">
         
         {/* Left Board (Low Values) - Hidden on Mobile */}
         <div className="hidden xl:block w-48 sticky top-4">
@@ -225,7 +308,7 @@ export default function Home() {
                   isOpen={c.isOpen}
                   value={c.value}
                   onClick={() => handleCaseClick(c.id)}
-                  disabled={gameState !== 'PICK_CASE' && gameState !== 'OPEN_CASES'}
+                  disabled={dialogueQueue.length > 0 || (gameState !== 'PICK_CASE' && gameState !== 'OPEN_CASES')}
                   isMyCase={false}
                 />
               ))}
@@ -296,6 +379,11 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <HostDialogue 
+        scriptLines={dialogueQueue}
+        onComplete={handleDialogueComplete}
+      />
 
     </main>
   );

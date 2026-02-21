@@ -117,6 +117,18 @@ npm run build
 npm start
 ```
 
+## Development Roadmap
+
+### Phase 2: The Host Character
+**User Journey Step:** Interactive Host Narrative System
+
+**Feature:** Host Dialogue System with RPG-style narrative in Burmese
+- Implemented typewriter animation with click-to-advance mechanics
+- SYS.BROKER character delivers contextual reactions based on player actions
+- Dynamic dialogue triggers: GAME_START, GOOD_OPEN, BAD_OPEN, BANKER_OFFER, DEAL_ACCEPTED, NO_DEAL, GAME_OVER
+- Blocks game actions during active dialogue to enforce narrative pacing
+- Fixed bottom overlay with retro terminal aesthetic matching the Bloomberg Terminal theme
+
 ## Future Research & Enhancements
 
 ### Dynamic Banker AI
