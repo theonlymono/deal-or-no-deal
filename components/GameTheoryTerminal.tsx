@@ -8,6 +8,8 @@ interface GameTheoryTerminalProps {
   remainingValues: number[];
   bankerOffer: number | null;
   gameState?: string;
+  bankerPersona?: 'NEUTRAL' | 'AGGRESSIVE' | 'FORGIVING' | 'PUNITIVE' | 'GAMBLER';
+  hesitationIndex?: number;
 }
 
 interface GameTheoryMetrics {
@@ -22,6 +24,8 @@ const GameTheoryTerminal: React.FC<GameTheoryTerminalProps> = ({
   remainingValues,
   bankerOffer,
   gameState,
+  bankerPersona = 'NEUTRAL',
+  hesitationIndex = 0,
 }) => {
   const [displayedMetrics, setDisplayedMetrics] = useState<Partial<GameTheoryMetrics>>({});
   const [typedRecommendation, setTypedRecommendation] = useState('');
@@ -338,6 +342,48 @@ const GameTheoryTerminal: React.FC<GameTheoryTerminalProps> = ({
               </div>
             </div>
           )}
+
+          {/* New Profiling Section */}
+          <div className="mb-6 bg-[#EAE5D9] border-2 border-[#1A1A1A] p-4 shadow-[4px_4px_0px_rgba(26,26,26,0.1)]">
+            <div className="text-[10px] text-[#1A1A1A] font-bold uppercase tracking-widest mb-3 border-b-2 border-[#A8A295] pb-2 flex items-center justify-between">
+              <span>&gt; BANKER PROFILING // ALGORITHM ADAPTIVE</span>
+              {bankerPersona !== 'NEUTRAL' && (
+                <span className={`animate-pulse px-2 py-0.5 text-[9px] font-extrabold text-[#EAE5D9] ${
+                  bankerPersona === 'FORGIVING' ? 'bg-[#00873E]' : 
+                  bankerPersona === 'AGGRESSIVE' || bankerPersona === 'PUNITIVE' ? 'bg-[#dc2626]' : 
+                  'bg-bloomberg-orange'
+                }`}>
+                  [ PROFILE: {bankerPersona} {
+                    bankerPersona === 'AGGRESSIVE' ? '// SPREAD REDUCED ' : 
+                    bankerPersona === 'FORGIVING' ? '// SPREAD INCREASED ' : 
+                    bankerPersona === 'PUNITIVE' ? '// SPREAD CAPPED ' : 
+                    bankerPersona === 'GAMBLER' ? '// SPREAD RANDOMIZED ' : ''
+                  }]
+                </span>
+              )}
+            </div>
+            
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-end">
+                <span className="text-[9px] uppercase font-bold text-[#1A1A1A]/70">Hesitation Index (Avg Click Delay)</span>
+                <span className="text-xs font-mono font-bold text-[#1A1A1A]">{hesitationIndex}/100</span>
+              </div>
+              <div className="w-full h-3 bg-[#D4CDC0] border border-[#1A1A1A] relative overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-700 ease-out bg-[#1A1A1A]`}
+                  style={{ width: `${hesitationIndex}%` }}
+                ></div>
+                {/* Guidelines */}
+                <div className="absolute top-0 left-[20%] w-px h-full bg-[#1A1A1A]/20"></div> {/* 3s ~ 20% */}
+                <div className="absolute top-0 right-[46.6%] w-px h-full bg-[#1A1A1A]/20"></div> {/* 8s / 15s approx 53% -> 100-53.3 = 46.7% */}
+              </div>
+              <div className="flex justify-between text-[8px] text-[#1A1A1A]/50 uppercase font-bold mt-1">
+                <span>Fast (&lt;3s)</span>
+                <span>Normal</span>
+                <span>Hesitant (&gt;8s)</span>
+              </div>
+            </div>
+          </div>
 
           {/* Savage Regret Matrix */}
           {bankerOffer !== null && bankerOffer > 0 && (

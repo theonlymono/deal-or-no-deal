@@ -6,9 +6,10 @@ import Image from 'next/image';
 interface HostDialogueProps {
   scriptLines: string[];
   onComplete: () => void;
+  bankerPersona?: 'NEUTRAL' | 'AGGRESSIVE' | 'FORGIVING' | 'PUNITIVE' | 'GAMBLER';
 }
 
-const HostDialogue: React.FC<HostDialogueProps> = ({ scriptLines, onComplete }) => {
+const HostDialogue: React.FC<HostDialogueProps> = ({ scriptLines, onComplete, bankerPersona = 'NEUTRAL' }) => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -115,8 +116,17 @@ const HostDialogue: React.FC<HostDialogueProps> = ({ scriptLines, onComplete }) 
                 
                 {/* Character Label */}
                 <div className="flex flex-col">
-                  <span className="text-bloomberg-orange font-mono text-[10px] md:text-sm font-bold tracking-widest">
+                  <span className="text-bloomberg-orange font-mono text-[10px] md:text-sm font-bold tracking-widest flex items-center gap-2">
                     MG MG AYE
+                    {bankerPersona !== 'NEUTRAL' && (
+                      <span className={`px-1 py-0.5 text-[8px] md:text-[10px] leading-none text-ink-black ${
+                        bankerPersona === 'FORGIVING' ? 'bg-[#00873E]' : 
+                        bankerPersona === 'AGGRESSIVE' || bankerPersona === 'PUNITIVE' ? 'bg-[#dc2626]' : 
+                        'bg-bloomberg-orange'
+                      }`}>
+                        [ {bankerPersona} MODE ]
+                      </span>
+                    )}
                   </span>
                   <span className="text-grid-line font-mono text-[8px] md:text-xs">
                     STATUS: {isTyping ? 'TRANSMITTING...' : 'AWAITING INPUT...'}

@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MONEY_VALUES, ROUND_STRUCTURE, RISK_FACTORS, GameState } from '../lib/gameConstants';
 import Board from '../components/Board';
+
+export type BankerPersona = 'NEUTRAL' | 'AGGRESSIVE' | 'FORGIVING' | 'PUNITIVE' | 'GAMBLER';
 import Case from '../components/Case';
 import BankerPhone from '../components/BankerPhone';
 import GameRules from '@/components/GameRules';
@@ -35,6 +37,22 @@ export default function Home() {
 
   const receiptRef = useRef<HTMLDivElement>(null);
   const [receiptData, setReceiptData] = useState<{ date: string; transactionId: string } | null>(null);
+
+  // New Adaptive AI States
+  const [bankerPersona, setBankerPersona] = useState<BankerPersona>('NEUTRAL');
+  const [hesitationIndex, setHesitationIndex] = useState<number>(0);
+  const lastClickTime = useRef<number>(Date.now());
+  const clickDurations = useRef<number[]>([]);
+  const bankerTimer = useRef<NodeJS.Timeout | null>(null);
+  const gameStartTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (bankerTimer.current) clearTimeout(bankerTimer.current);
+      if (gameStartTimer.current) clearTimeout(gameStartTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     if ((gameState === 'GAME_OVER' || gameState === 'DEAL_ACCEPTED') && finalResult) {
@@ -85,8 +103,14 @@ export default function Home() {
     setBankerOffer(0);
     setMessage("Select your case to keep.");
     setFinalResult(null);
+    setBankerPersona('NEUTRAL');
+    setHesitationIndex(0);
+    clickDurations.current = [];
+    lastClickTime.current = Date.now();
+
     // Trigger game start dialogue
-    setTimeout(() => {
+    if (gameStartTimer.current) clearTimeout(gameStartTimer.current);
+    gameStartTimer.current = setTimeout(() => {
       triggerDialogue([
         "ကြိုဆိုပါတယ်။ သင့်ရဲ့ ကံကြမ္မာကို ပြောင်းလဲပေးမယ့် ကစားပွဲကနေ စတင်လိုက်ရအောင်။",
         "သေတ္တာ (၂၆) လုံးထဲက သင့်အတွက် အရေးအကြီးဆုံး တစ်လုံးကို အရင်ရွေးချယ်ပါ။"
@@ -153,12 +177,24 @@ const BAD_OPEN_DIALOGUES = [
     initGame(shuffleArray);
   };
 
-  const calculateOffer = (currentEliminated: number[], currentRound: number) => {
+  const calculateOffer = (currentEliminated: number[], currentRound: number, persona: BankerPersona) => {
     const remainingValues = MONEY_VALUES.filter(v => !currentEliminated.includes(v));
     const total = remainingValues.reduce((sum, val) => sum + val, 0);
     const expectedValue = total / remainingValues.length;
-    const riskFactor = RISK_FACTORS[currentRound] || 0.95;
-    return Math.floor(expectedValue * riskFactor);
+    let riskFactor = RISK_FACTORS[currentRound] || 0.95;
+
+    if (persona === 'AGGRESSIVE') riskFactor -= 0.10;
+    if (persona === 'FORGIVING') riskFactor += 0.10;
+    if (persona === 'PUNITIVE') riskFactor = Math.min(0.80, riskFactor);
+
+    let offer = expectedValue * riskFactor;
+
+    if (persona === 'GAMBLER') {
+      const variance = 0.80 + Math.random() * (1.15 - 0.80);
+      offer *= variance;
+    }
+
+    return Math.floor(offer);
   };
 
   const handleCaseClick = (id: number) => {
@@ -166,8 +202,18 @@ const BAD_OPEN_DIALOGUES = [
       setMyCaseId(id);
       setGameState('OPEN_CASES');
       setMessage(`Open ${casesToOpenInRound} case${casesToOpenInRound > 1 ? 's' : ''} to reveal values.`);
+      lastClickTime.current = Date.now();
     } else if (gameState === 'OPEN_CASES') {
       if (id === myCaseId || cases.find(c => c.id === id)?.isOpen) return;
+
+      const now = Date.now();
+      const duration = now - lastClickTime.current;
+      lastClickTime.current = now;
+      clickDurations.current.push(duration);
+      
+      const avgDuration = clickDurations.current.reduce((a, b) => a + b, 0) / clickDurations.current.length;
+      const hIndex = Math.min(100, Math.max(0, Math.floor((avgDuration / 15000) * 100)));
+      setHesitationIndex(hIndex);
 
       const selectedCase = cases.find(c => c.id === id);
       if (!selectedCase) return;
@@ -201,17 +247,39 @@ const BAD_OPEN_DIALOGUES = [
         // Round Over, wait 3 seconds before Banker Calls
         setGameState('BANKER_CALLING');
         
-        setTimeout(() => {
-          const offer = calculateOffer(newEliminated, round);
+        let newPersona = bankerPersona;
+        if (bankerPersona !== 'PUNITIVE') {
+          if (avgDuration < 3000) newPersona = 'AGGRESSIVE';
+          else if (avgDuration > 8000) newPersona = 'FORGIVING';
+          else {
+            if (Math.random() < 0.3) newPersona = 'GAMBLER';
+            else newPersona = 'NEUTRAL';
+          }
+          setBankerPersona(newPersona);
+        }
+
+        if (bankerTimer.current) clearTimeout(bankerTimer.current);
+        bankerTimer.current = setTimeout(() => {
+          const offer = calculateOffer(newEliminated, round, newPersona);
           setBankerOffer(offer);
           setGameState('BANKER_OFFER');
           setMessage("The Banker is calling...");
-          // Trigger banker offer dialogue
-          triggerDialogue([
+          
+          let bankerDialogue = [
             "ခဏလေး... ဖုန်းဝင်လာတယ်။",
             "Banker ဆီကပါ။ သူက သင့်ရဲ့ ရပ်တည်ချက်ကို စမ်းသပ်နေပြီ။",
             "Game Theory Terminal ကို သေချာကြည့်ပြီး ဆုံးဖြတ်ပါ။"
-          ]);
+          ];
+
+          if (newPersona === 'AGGRESSIVE') {
+            bankerDialogue.push("System analysis indicates erratic choices. Offer reduced.");
+          } else if (newPersona === 'FORGIVING') {
+            bankerDialogue.push("Risk threshold elevated. Premium offered for immediate exit.");
+          } else if (newPersona === 'PUNITIVE') {
+            bankerDialogue.push("Irrational optimism detected. Safety net removed. Future offers capped.");
+          }
+
+          triggerDialogue(bankerDialogue);
         }, 3000);
       } else {
         // Check if good or bad case opened (under $10,000 = good, $100,000+ = bad)
@@ -240,6 +308,15 @@ const BAD_OPEN_DIALOGUES = [
   };
 
   const handleNoDeal = () => {
+    // Check for PUNITIVE trigger
+    const remainingValues = MONEY_VALUES.filter(v => !eliminatedValues.includes(v));
+    const ev = remainingValues.length > 0 ? remainingValues.reduce((sum, val) => sum + val, 0) / remainingValues.length : 0;
+    if (bankerOffer >= ev) {
+      setBankerPersona('PUNITIVE');
+    }
+
+    lastClickTime.current = Date.now(); // reset timing
+
     // Check if it was the last round (2 cases left: 26 total - 24 eliminated = 2 remaining)
     const totalEliminated = eliminatedValues.length;
     const remainingCases = 26 - totalEliminated;
@@ -453,6 +530,8 @@ const BAD_OPEN_DIALOGUES = [
             remainingValues={MONEY_VALUES.filter(v => !eliminatedValues.includes(v))}
             bankerOffer={gameState === 'BANKER_OFFER' ? bankerOffer : null}
             gameState={gameState}
+            bankerPersona={bankerPersona}
+            hesitationIndex={hesitationIndex}
           />
         </div>
       )}
@@ -519,6 +598,7 @@ const BAD_OPEN_DIALOGUES = [
       <HostDialogue 
         scriptLines={dialogueQueue}
         onComplete={handleDialogueComplete}
+        bankerPersona={bankerPersona}
       />
 
     </main>
