@@ -32,8 +32,8 @@ const MoneyRow = ({ value, isEliminated }: { value: number, isEliminated: boolea
     <div
       className={`
         relative flex items-center justify-between 
-        px-3 py-1 mb-1.5
-        font-mono text-sm md:text-base lg:text-lg text-right
+        px-2 py-0.5 md:px-3 md:py-1 mb-1 md:mb-1.5
+        font-mono text-[10px] sm:text-xs md:text-base lg:text-lg text-right
         transition-all duration-500 ease-out
         ${containerClass} ${bgClass}
       `}
@@ -45,7 +45,7 @@ const MoneyRow = ({ value, isEliminated }: { value: number, isEliminated: boolea
 
       {/* Eliminated "X" Marker */}
       {isEliminated && (
-        <span className="absolute left-2 text-ink-black/20 text-xs font-bold">---</span>
+        <span className="absolute left-1 md:left-2 text-ink-black/20 text-[8px] md:text-xs font-bold">---</span>
       )}
     </div>
   );
@@ -57,14 +57,14 @@ const Board: React.FC<BoardProps> = ({ eliminatedValues, side = 'both' }) => {
 
   // Wrapper for columns
   const ColumnWrapper = ({ title, children, align }: { title: string, children: React.ReactNode, align: 'left' | 'right' }) => (
-    <div className={`flex flex-col w-36 md:w-44 lg:w-48 ${align === 'right' ? 'items-end' : 'items-start'}`}>
+    <div className={`flex flex-col w-[110px] sm:w-36 md:w-44 lg:w-48 ${align === 'right' ? 'items-end' : 'items-start'}`}>
       
       {/* Header Badge */}
       <div className={`
-        mb-2 px-3 py-0.5 text-xs font-mono uppercase tracking-[0.2em] border border-ink-black
+        mb-1 md:mb-2 px-2 py-0.5 text-[8px] md:text-xs font-mono uppercase tracking-[0.1em] md:tracking-[0.2em] border border-ink-black
         ${title === 'HIGH' ? 'bg-bloomberg-orange text-ink-black font-bold' : 'bg-transparent text-ink-black'}
       `}>
-        {title} Inputs
+        {title}
       </div>
 
       <div className="w-full">

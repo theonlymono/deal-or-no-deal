@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 
 interface BankerPhoneProps {
   isOpen: boolean;
@@ -12,8 +12,33 @@ interface BankerPhoneProps {
 const BankerPhone: React.FC<BankerPhoneProps> = ({ isOpen, offer, onDeal, onNoDeal }) => {
   if (!isOpen) return null;
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useLayoutEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    el.currentTime = 0;
+    el.volume = 0.7;
+    el.play().catch(() => {});
+    return () => {
+      try {
+        el.pause();
+        el.currentTime = 0;
+      } catch {}
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <audio
+        ref={audioRef}
+        src="/Old Phone Ringtone.mp3"
+        loop
+        preload="auto"
+        autoPlay
+        playsInline
+        className="hidden"
+      />
       
       {/* 1. Backdrop (Clean Blur) */}
       <div className="absolute inset-0 bg-ink-black/60 backdrop-blur-sm animate-in fade-in duration-300"></div>
@@ -23,6 +48,10 @@ const BankerPhone: React.FC<BankerPhoneProps> = ({ isOpen, offer, onDeal, onNoDe
         
         {/* Decorative 'Paper Clip' Visual (Top Center) */}
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 border-4 border-grid-line rounded-t-full bg-paper-dark z-0"></div>
+        {/* Ringing Phone GIF (Top Center) */}
+        <div className="absolute -top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+          <img src="/ringing_phone..gif" alt="Ringing Phone" className="w-24 h-24 md:w-28 md:h-28 object-contain" />
+        </div>
 
         {/* Header Strip */}
         <div className="bg-ink-black py-3 px-6 relative z-10 flex justify-between items-center">

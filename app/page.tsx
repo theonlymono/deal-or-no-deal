@@ -10,6 +10,7 @@ import GameTheoryTerminal from '@/components/GameTheoryTerminal';
 import HeaderTicker from '@/components/HeaderTicker';
 import TickerMarquee from '@/components/TickerMarquee';
 import HostDialogue from '@/components/HostDialogue';
+import StartScreen from '@/components/StartScreen';
 
 interface CaseData {
   id: number;
@@ -18,6 +19,7 @@ interface CaseData {
 }
 
 export default function Home() {
+  const [showStartScreen, setShowStartScreen] = useState(true);
   const [cases, setCases] = useState<CaseData[]>([]);
   const [myCaseId, setMyCaseId] = useState<number | null>(null);
   const [gameState, setGameState] = useState<GameState>('PICK_CASE');
@@ -28,6 +30,16 @@ export default function Home() {
   const [message, setMessage] = useState("Select your case to keep.");
   const [dialogueQueue, setDialogueQueue] = useState<string[]>([]);
   const [finalResult, setFinalResult] = useState<{ winAmount: number; source: 'DEAL' | 'CASE' } | null>(null);
+
+  useEffect(() => {
+    if ((gameState === 'GAME_OVER' || gameState === 'DEAL_ACCEPTED') && finalResult) {
+      try {
+        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+          navigator.vibrate([120, 60, 120, 60, 300]);
+        }
+      } catch {}
+    }
+  }, [gameState, finalResult]);
 
   // Initialize Game
   useEffect(() => {
@@ -244,6 +256,8 @@ const BAD_OPEN_DIALOGUES = [
 
   return (
     <main className="min-h-screen bg-paper-bg grid-bg relative overflow-hidden flex flex-col items-center pb-6">
+      {showStartScreen && <StartScreen onStart={() => setShowStartScreen(false)} />}
+      
       {/* Visual Effects */}
       <div className="crt-flicker pointer-events-none fixed inset-0 z-50 opacity-[0.02]"></div>
       
@@ -254,19 +268,19 @@ const BAD_OPEN_DIALOGUES = [
       {/* <TickerMarquee /> */}
 
       {/* Main Game Area */}
-      <div className="flex flex-col xl:flex-row w-full max-w-7xl items-start justify-center gap-6 z-10 mb-20 md:mb-0 px-4 mt-14">
+      <div className="flex flex-col lg:flex-row w-full max-w-7xl items-start justify-center gap-4 lg:gap-6 z-10 mb-20 md:mb-0 px-2 sm:px-4 mt-8 lg:mt-14">
         
-        {/* Left Board (Low Values) - Hidden on Mobile */}
-        <div className="hidden xl:block w-48 sticky top-4">
+        {/* Left Board (Low Values) - Hidden on Mobile Portrait, Shown on LG+ */}
+        <div className="hidden lg:block w-48 sticky top-4">
            <Board eliminatedValues={eliminatedValues} side="left" />
         </div>
 
         {/* Center: Message & Cases */}
         <div className="flex-1 w-full max-w-4xl flex flex-col items-center">
             {/* Status Bar - Style: "Clean Instruction" */}
-            <div className="w-full max-w-2xl mx-auto mb-8 relative">
+            <div className="w-full max-w-2xl mx-auto mb-4 lg:mb-8 relative">
                {/* Background box with Retro Shadow */}
-               <div className="bg-paper-bg border-2 border-ink-black px-6 py-4 text-center shadow-[4px_4px_0px_rgba(26,26,26,0.15)]">
+               <div className="bg-paper-bg border-2 border-ink-black px-4 py-3 md:px-6 md:py-4 text-center shadow-[4px_4px_0px_rgba(26,26,26,0.15)]">
                  
                  {/* Decorative Corner Accents */}
                  <div className="absolute top-1 left-1 w-2 h-2 border-t-2 border-l-2 border-ink-black opacity-50"></div>
@@ -275,7 +289,7 @@ const BAD_OPEN_DIALOGUES = [
                  <div className="absolute bottom-1 right-1 w-2 h-2 border-b-2 border-r-2 border-ink-black opacity-50"></div>
 
                  {/* The Message */}
-                 <p className="font-mono text-ink-black text-lg md:text-xl font-bold uppercase tracking-wider flex items-center justify-center gap-3">
+                 <p className="font-mono text-ink-black text-base sm:text-lg md:text-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 md:gap-3">
                    {/* Blinking cursor effect to keep the terminal vibe but subtle */}
                    <span className="text-bloomberg-orange animate-pulse">►</span>
                    {message}
@@ -285,8 +299,8 @@ const BAD_OPEN_DIALOGUES = [
 
             {/* My Case Area */}
             {myCaseId && (
-              <div className="mb-8 flex flex-col items-center animate-bounce-slow">
-                <span className="font-header text-ink-black mb-2 tracking-widest bg-paper-dark px-2">YOUR CASE</span>
+              <div className="mb-6 lg:mb-8 flex flex-col items-center animate-bounce-slow">
+                <span className="font-header text-ink-black text-sm mb-1 tracking-widest bg-paper-dark px-2">YOUR CASE</span>
                 <Case 
                   id={myCaseId} 
                   isOpen={cases.find(c => c.id === myCaseId)?.isOpen || false}
@@ -299,8 +313,8 @@ const BAD_OPEN_DIALOGUES = [
             )}
 
             {/* Cases Grid */}
-            {/* UPDATED: Tighter gap, more columns on large screens */}
-            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-6 gap-2 md:gap-3 justify-center w-full max-w-3xl mx-auto">
+            {/* UPDATED: Better columns for mobile portrait and forced centering */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-3 justify-center justify-items-center w-full max-w-3xl mx-auto px-2">
               {cases.filter(c => c.id !== myCaseId).map((c) => (
                 <Case 
                   key={c.id} 
@@ -313,16 +327,16 @@ const BAD_OPEN_DIALOGUES = [
                 />
               ))}
             </div>
+
+            {/* Mobile Board (Both Columns) - Shown AFTER Cases on Portrait */}
+            <div className="w-full lg:hidden mt-8 mb-6 px-2">
+                 <Board eliminatedValues={eliminatedValues} side="both" />
+            </div>
         </div>
 
-        {/* Right Board (High Values) - Hidden on Mobile */}
-        <div className="hidden xl:block w-48 sticky top-4">
+        {/* Right Board (High Values) - Hidden on Mobile Portrait, Shown on LG+ */}
+        <div className="hidden lg:block w-48 sticky top-4">
              <Board eliminatedValues={eliminatedValues} side="right" />
-        </div>
-
-        {/* Mobile Board (Both Columns at Bottom) */}
-        <div className="w-full xl:hidden mt-8 pb-20">
-             <Board eliminatedValues={eliminatedValues} side="both" />
         </div>
       </div>
 

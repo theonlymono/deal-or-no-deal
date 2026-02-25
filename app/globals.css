@@ -99,3 +99,75 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #FF5500; /* bloomberg-orange */
 }
+
+.tv-glitch {
+  position: relative;
+}
+.tv-glitch .glitch-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: glitchShiftHorizontal 120ms infinite steps(20), glitchWindow 8s infinite;
+  pointer-events: none;
+}
+.tv-glitch .glitch-red    { filter: hue-rotate(0deg)   saturate(1.6) contrast(1.1); }
+.tv-glitch .glitch-purple { filter: hue-rotate(280deg) saturate(1.6) contrast(1.1); animation-delay: -0.08s; }
+.tv-glitch .glitch-green  { filter: hue-rotate(120deg) saturate(1.6) contrast(1.1); animation-delay: -0.16s; }
+.tv-glitch .tv-noise {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom, rgba(26,26,26,0.06) 0 2px, transparent 2px 4px);
+  opacity: 0.16;
+  animation: noiseFlash 1s infinite steps(14);
+  pointer-events: none;
+}
+/* Vertical stripes for strong color tearing */
+.tv-glitch .glitch-stripe {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: lighten;
+  animation: stripeWindow 8s infinite, stripeJitterX 180ms infinite steps(12);
+  pointer-events: none;
+}
+.tv-glitch .stripe-1 { clip-path: inset(0 75% 0 0);  filter: hue-rotate(0deg)   saturate(1.6); }
+.tv-glitch .stripe-2 { clip-path: inset(0 40% 0 40%); filter: hue-rotate(280deg) saturate(1.6); animation-delay: 60ms; }
+.tv-glitch .stripe-3 { clip-path: inset(0 0 0 75%);  filter: hue-rotate(120deg) saturate(1.6); animation-delay: 120ms; }
+@keyframes glitchShiftHorizontal {
+  0%   { transform: translateX(0) skewX(0deg); }
+  20%  { transform: translateX(6px)  skewX(1deg); }
+  40%  { transform: translateX(-7px) skewX(-1deg); }
+  60%  { transform: translateX(8px)  skewX(1deg); }
+  80%  { transform: translateX(-8px) skewX(-1deg); }
+  100% { transform: translateX(0)    skewX(0deg); }
+}
+@keyframes noiseFlash {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.18; }
+}
+@keyframes glitchWindow {
+  0%, 22%   { opacity: 0; }
+  23%, 35%  { opacity: 0.55; }
+  36%, 46%  { opacity: 0; }
+  47%, 56%  { opacity: 0.55; }
+  57%, 67%  { opacity: 0; }
+  68%, 78%  { opacity: 0.55; }
+  79%, 100% { opacity: 0; }
+}
+@keyframes stripeWindow {
+  0%, 22%   { opacity: 0; transform: translateX(0); }
+  23%, 35%  { opacity: 0.65; }
+  36%, 46%  { opacity: 0; transform: translateX(0); }
+  47%, 56%  { opacity: 0.65; }
+  57%, 67%  { opacity: 0; transform: translateX(0); }
+  68%, 78%  { opacity: 0.65; }
+  79%, 100% { opacity: 0; transform: translateX(0); }
+}
+@keyframes stripeJitterX {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(6px); }
+  50% { transform: translateX(-7px); }
+  75% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}

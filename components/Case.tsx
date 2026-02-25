@@ -12,14 +12,22 @@ interface CaseProps {
 }
 
 const Case: React.FC<CaseProps> = ({ id, isOpen, value, onClick, disabled, isMyCase }) => {
+  const handlePress = () => {
+    try {
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate(40);
+      }
+    } catch {}
+    onClick();
+  };
   return (
     <button
-      onClick={onClick}
+      onClick={handlePress}
       disabled={disabled || isOpen}
       className={`
         relative 
         /* UPDATED SIZES: Compact grid look */
-        w-16 h-12 sm:w-20 sm:h-14 md:w-24 md:h-16 lg:w-28 lg:h-20
+        w-[90px] h-14 sm:w-20 sm:h-14 md:w-24 md:h-16 lg:w-28 lg:h-20
         flex items-center justify-center 
         border-2 
         transition-all duration-200 ease-in-out
@@ -32,7 +40,7 @@ const Case: React.FC<CaseProps> = ({ id, isOpen, value, onClick, disabled, isMyC
       {/* Folder Tab Effect - Scaled Down */}
       <div className={`
         absolute top-[-6px] left-[-2px] 
-        w-6 h-3 sm:w-8 sm:h-3 md:w-10 md:h-4
+        w-8 h-3 sm:w-8 sm:h-3 md:w-10 md:h-4
         border-t-2 border-l-2 border-r-2 border-ink-black 
         ${isOpen ? 'bg-paper-dark' : 'bg-paper-bg'}
         rounded-t-sm
@@ -41,12 +49,12 @@ const Case: React.FC<CaseProps> = ({ id, isOpen, value, onClick, disabled, isMyC
       {/* Content */}
       <div className="z-10 text-ink-black leading-none mt-1">
         {isOpen ? (
-          <span className="font-mono text-xs sm:text-sm md:text-base font-bold">
+          <span className="font-mono text-[10px] sm:text-sm md:text-base font-bold">
              {/* Shorten large numbers visually if needed, but flex usually handles it */}
             ${value?.toLocaleString('en-US', { notation: "compact", maximumFractionDigits: 1 })}
           </span>
         ) : (
-          <span className="text-xl sm:text-2xl md:text-3xl">{id}</span>
+          <span className="text-lg sm:text-2xl md:text-3xl">{id}</span>
         )}
       </div>
 
