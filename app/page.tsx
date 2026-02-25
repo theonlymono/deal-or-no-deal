@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MONEY_VALUES, ROUND_STRUCTURE, RISK_FACTORS, GameState } from '../lib/gameConstants';
 import Board from '../components/Board';
 import Case from '../components/Case';
@@ -11,6 +11,8 @@ import HeaderTicker from '@/components/HeaderTicker';
 import TickerMarquee from '@/components/TickerMarquee';
 import HostDialogue from '@/components/HostDialogue';
 import StartScreen from '@/components/StartScreen';
+import PrizeReceipt from '@/components/PrizeReceipt';
+import { toPng } from 'html-to-image';
 
 interface CaseData {
   id: number;
@@ -31,15 +33,26 @@ export default function Home() {
   const [dialogueQueue, setDialogueQueue] = useState<string[]>([]);
   const [finalResult, setFinalResult] = useState<{ winAmount: number; source: 'DEAL' | 'CASE' } | null>(null);
 
+  const receiptRef = useRef<HTMLDivElement>(null);
+  const [receiptData, setReceiptData] = useState<{ date: string; transactionId: string } | null>(null);
+
   useEffect(() => {
     if ((gameState === 'GAME_OVER' || gameState === 'DEAL_ACCEPTED') && finalResult) {
+      if (!receiptData) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+        const hash = 'TXN-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+        setReceiptData({ date: dateStr, transactionId: hash });
+      }
       try {
         if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
           navigator.vibrate([120, 60, 120, 60, 300]);
         }
       } catch {}
+    } else {
+      setReceiptData(null);
     }
-  }, [gameState, finalResult]);
+  }, [gameState, finalResult, receiptData]);
 
   // Initialize Game
   useEffect(() => {
@@ -284,6 +297,21 @@ const BAD_OPEN_DIALOGUES = [
     }
   };
 
+  const handleExportReceipt = async () => {
+    if (receiptRef.current) {
+      try {
+        const dataUrl = await toPng(receiptRef.current, { cacheBust: true, pixelRatio: 2 });
+        const link = document.createElement('a');
+        link.download = 'HAK_Dynamic_BankDraft.png';
+        link.href = dataUrl;
+        link.click();
+      } catch (err) {
+        console.error('Failed to export receipt', err);
+        setMessage('ERROR EXPORTING RECEIPT.');
+      }
+    }
+  };
+
   return (
     <main className="min-h-screen bg-paper-bg grid-bg relative overflow-hidden flex flex-col items-center pb-6">
       {showStartScreen && <StartScreen onStart={() => setShowStartScreen(false)} />}
@@ -430,6 +458,18 @@ const BAD_OPEN_DIALOGUES = [
       )}
 
       <GameRules />
+
+      {/* Off-screen Component for Image Export */}
+      {(gameState === 'GAME_OVER' || gameState === 'DEAL_ACCEPTED') && finalResult && receiptData && (
+        <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}>
+          <PrizeReceipt 
+            ref={receiptRef}
+            amount={finalResult.winAmount}
+            date={receiptData.date}
+            transactionId={receiptData.transactionId}
+          />
+        </div>
+      )}
       
       {/* Game Over Modal / Result Display */}
       {(gameState === 'GAME_OVER' || gameState === 'DEAL_ACCEPTED') && finalResult && (
@@ -455,12 +495,23 @@ const BAD_OPEN_DIALOGUES = [
                </div>
              )}
 
-             <button 
-               onClick={resetGame}
-               className="w-full bg-ink-black text-paper-bg px-6 py-4 font-header text-2xl hover:bg-bloomberg-orange hover:text-ink-black transition-colors border-2 border-transparent hover:border-ink-black uppercase tracking-widest"
-             >
-               PLAY AGAIN
-             </button>
+             <div className="flex flex-col gap-4 w-full mt-4">
+               <button 
+                 onClick={handleExportReceipt}
+                 className="w-full bg-paper-dark text-ink-black px-6 py-4 font-header text-xl hover:bg-paper-bg transition-colors border-4 border-ink-black shadow-[4px_4px_0px_rgba(26,26,26,1)] hover:translate-y-1 hover:shadow-none uppercase tracking-widest flex items-center justify-center gap-2"
+               >
+                 <span>EXPORT RECEIPT</span>
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                 </svg>
+               </button>
+               <button 
+                 onClick={resetGame}
+                 className="w-full bg-ink-black text-paper-bg px-6 py-4 font-header text-xl md:text-2xl hover:bg-bloomberg-orange hover:text-ink-black transition-colors border-4 border-transparent hover:border-ink-black shadow-[4px_4px_0px_#FF5500] hover:translate-y-1 hover:shadow-none uppercase tracking-widest"
+               >
+                 PLAY AGAIN
+               </button>
+             </div>
           </div>
         </div>
       )}
