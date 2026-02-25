@@ -299,8 +299,8 @@ const BAD_OPEN_DIALOGUES = [
             )}
 
             {/* Cases Grid */}
-            {/* UPDATED: Better columns for mobile portrait */}
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-3 justify-center w-full max-w-3xl mx-auto px-2">
+            {/* UPDATED: Better columns for mobile portrait and forced centering */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-3 justify-center justify-items-center w-full max-w-3xl mx-auto px-2">
               {cases.filter(c => c.id !== myCaseId).map((c) => (
                 <Case 
                   key={c.id} 
