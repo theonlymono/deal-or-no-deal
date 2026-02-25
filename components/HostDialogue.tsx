@@ -94,7 +94,7 @@ const HostDialogue: React.FC<HostDialogueProps> = ({ scriptLines, onComplete }) 
           {/* Added negative top margin (-mt-12 and md:-mt-24) to let the larger image overlap the top of the box */}
           <div className="flex-shrink-0 flex items-end justify-center mr-24 -mt-12 md:-mt-24">
             <Image
-              src="/mgmgaye.PNG"
+              src="/mgmgaye.png"
               alt="SYS.BROKER Host"
               width={300} // Increased base resolution
               height={300}
