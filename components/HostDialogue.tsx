@@ -89,36 +89,36 @@ const HostDialogue: React.FC<HostDialogueProps> = ({ scriptLines, onComplete }) 
         {/* Top decorative line */}
         <div className="h-1 bg-gradient-to-r from-bloomberg-orange via-ink-black to-bloomberg-orange opacity-50"></div>
         
-        <div className="max-w-5xl mx-auto px-4 py-6 flex gap-4">
+        <div className="max-w-5xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col md:flex-row gap-2 md:gap-4 items-start md:items-center">
           {/* Host Image - Left Side */}
           {/* Added negative top margin (-mt-12 and md:-mt-24) to let the larger image overlap the top of the box */}
-          <div className="flex-shrink-0 flex items-end justify-center mr-24 -mt-12 md:-mt-24">
+          <div className="flex-shrink-0 flex items-end justify-start md:justify-center md:mr-24 -mt-24 md:-mt-24">
             <Image
               src="/mgmgaye.png"
               alt="SYS.BROKER Host"
               width={300} // Increased base resolution
               height={300}
               // Drastically increased Tailwind width/height classes
-              className="w-40 h-40 md:w-72 md:h-72 object-contain drop-shadow-[0_0_15px_rgba(255,136,0,0.2)]" 
+              className="w-28 h-28 sm:w-32 sm:h-32 md:w-72 md:h-72 object-contain drop-shadow-[0_0_15px_rgba(255,136,0,0.2)] ml-4 md:ml-0" 
             />
           </div>
 
           {/* Content - Right Side */}
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             {/* Header Row */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between mb-2 md:mb-3">
+              <div className="flex items-center gap-2 md:gap-3">
                 {/* Character Avatar/Icon */}
-                <div className="w-10 h-10 bg-bloomberg-orange flex items-center justify-center border-2 border-paper-bg">
-                  <span className="text-ink-black font-bold text-lg">M</span>
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-bloomberg-orange flex items-center justify-center border-2 border-paper-bg">
+                  <span className="text-ink-black font-bold text-sm md:text-lg">M</span>
                 </div>
                 
                 {/* Character Label */}
                 <div className="flex flex-col">
-                  <span className="text-bloomberg-orange font-mono text-sm font-bold tracking-widest">
+                  <span className="text-bloomberg-orange font-mono text-[10px] md:text-sm font-bold tracking-widest">
                     MG MG AYE
                   </span>
-                  <span className="text-grid-line font-mono text-xs">
+                  <span className="text-grid-line font-mono text-[8px] md:text-xs">
                     STATUS: {isTyping ? 'TRANSMITTING...' : 'AWAITING INPUT...'}
                   </span>
                 </div>
@@ -126,52 +126,52 @@ const HostDialogue: React.FC<HostDialogueProps> = ({ scriptLines, onComplete }) 
 
               {/* Progress indicator */}
               <div className="flex items-center gap-2">
-                <span className="text-grid-line font-mono text-xs">LINE</span>
-                <span className="bg-paper-dark text-ink-black font-mono text-xs px-2 py-1 font-bold">
+                <span className="text-grid-line font-mono text-[8px] md:text-xs">LINE</span>
+                <span className="bg-paper-dark text-ink-black font-mono text-[10px] md:text-xs px-2 py-0.5 md:py-1 font-bold">
                   {progressIndicator}
                 </span>
               </div>
             </div>
 
           {/* Main dialogue text area */}
-          <div className="relative min-h-[80px] bg-paper-dark/10 border-2 border-paper-dark/30 p-4">
+          <div className="relative min-h-[60px] md:min-h-[80px] bg-paper-dark/10 border-2 border-paper-dark/30 p-3 md:p-4 md:flex md:items-center">
             {/* Corner accents */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-bloomberg-orange"></div>
-            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-bloomberg-orange"></div>
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-bloomberg-orange"></div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-bloomberg-orange"></div>
+            <div className="absolute top-0 left-0 w-2 md:w-3 h-2 md:h-3 border-t-2 border-l-2 border-bloomberg-orange"></div>
+            <div className="absolute top-0 right-0 w-2 md:w-3 h-2 md:h-3 border-t-2 border-r-2 border-bloomberg-orange"></div>
+            <div className="absolute bottom-0 left-0 w-2 md:w-3 h-2 md:h-3 border-b-2 border-l-2 border-bloomberg-orange"></div>
+            <div className="absolute bottom-0 right-0 w-2 md:w-3 h-2 md:h-3 border-b-2 border-r-2 border-bloomberg-orange"></div>
 
             {/* Typewriter text */}
-            <p className="font-myanmar text-paper-bg text-lg md:text-xl leading-relaxed tracking-wide">
+            <p className="font-myanmar text-paper-bg text-sm sm:text-base md:text-xl leading-relaxed tracking-wide">
               {displayedText}
               {/* Blinking cursor */}
-              <span className={`inline-block w-2 h-5 bg-bloomberg-orange ml-1 ${isTyping ? 'animate-pulse' : 'opacity-50'}`}></span>
+              <span className={`inline-block w-1.5 md:w-2 h-4 md:h-5 bg-bloomberg-orange ml-1 ${isTyping ? 'animate-pulse' : 'opacity-50'}`}></span>
             </p>
 
             {/* Click hint */}
-            <div className="absolute bottom-2 right-4 flex items-center gap-2">
-              <span className="text-grid-line font-mono text-xs animate-pulse">
+            <div className="absolute bottom-1 md:bottom-2 right-2 md:right-4 flex items-center gap-1 md:gap-2">
+              <span className="text-grid-line font-mono text-[8px] md:text-xs animate-pulse">
                 {isTyping ? '[ CLICK TO SKIP ]' : '[ CLICK TO CONTINUE ]'}
               </span>
-              <span className="text-bloomberg-orange">►</span>
+              <span className="text-bloomberg-orange text-[10px] md:text-base">►</span>
             </div>
           </div>
 
             {/* Bottom decorative elements */}
-            <div className="flex items-center justify-between mt-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-bloomberg-orange animate-pulse rounded-full"></div>
-                <span className="text-grid-line font-mono text-xs uppercase tracking-widest">
+            <div className="flex items-center justify-between mt-2 md:mt-3">
+              <div className="flex items-center gap-1 md:gap-2">
+                <div className="w-1.5 md:w-2 h-1.5 md:h-2 bg-bloomberg-orange animate-pulse rounded-full"></div>
+                <span className="text-grid-line font-mono text-[8px] md:text-xs uppercase tracking-widest">
                   Secure Channel // Encrypted
                 </span>
               </div>
               
               {/* Signal strength bars */}
-              <div className="flex items-end gap-1 h-4">
-                <div className="w-1 bg-bloomberg-orange h-1"></div>
-                <div className="w-1 bg-bloomberg-orange h-2"></div>
-                <div className="w-1 bg-bloomberg-orange h-3"></div>
-                <div className="w-1 bg-bloomberg-orange h-4 animate-pulse"></div>
+              <div className="flex items-end gap-0.5 md:gap-1 h-3 md:h-4">
+                <div className="w-0.5 md:w-1 bg-bloomberg-orange h-1"></div>
+                <div className="w-0.5 md:w-1 bg-bloomberg-orange h-2"></div>
+                <div className="w-0.5 md:w-1 bg-bloomberg-orange h-3"></div>
+                <div className="w-0.5 md:w-1 bg-bloomberg-orange h-4 animate-pulse"></div>
               </div>
             </div>
           </div>

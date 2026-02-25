@@ -136,17 +136,17 @@ const GameTheoryTerminal: React.FC<GameTheoryTerminalProps> = ({
   };
 
   return (
-    <section className="w-full max-w-5xl mx-auto mt-20 px-6 relative z-10 font-mono">
+    <section className="w-full max-w-5xl mx-auto mt-8 md:mt-20 px-2 sm:px-4 md:px-6 relative z-10 font-mono">
 
       {/* Decorative "Cut Here" Line */}
-      <div className="w-full flex items-center gap-4 mb-8 opacity-50">
+      <div className="w-full flex items-center gap-2 md:gap-4 mb-4 md:mb-8 opacity-50 px-2">
         <div className="h-px bg-[#1A1A1A] flex-1 border-t-2 border-dashed border-[#1A1A1A]"></div>
-        <span className="font-mono text-xs text-[#1A1A1A] uppercase tracking-widest">Game Theory Terminal </span>
+        <span className="font-mono text-[10px] md:text-xs text-[#1A1A1A] uppercase tracking-widest whitespace-nowrap">Theory Module </span>
         <div className="h-px bg-[#1A1A1A] flex-1 border-t-2 border-dashed border-[#1A1A1A]"></div>
       </div>
 
       {/* Light Mode / Ledger Container */}
-      <div className="relative bg-[#fafaf7] border-2 border-[#1A1A1A] shadow-[6px_6px_0px_rgba(26,26,26,1)] p-1 text-[#1A1A1A]">
+      <div className="relative bg-[#fafaf7] border-2 border-[#1A1A1A] shadow-[4px_4px_0px_rgba(26,26,26,1)] md:shadow-[6px_6px_0px_rgba(26,26,26,1)] p-0.5 md:p-1 text-[#1A1A1A]">
         
         {/* Graph Paper / Dot Matrix Background */}
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -154,46 +154,46 @@ const GameTheoryTerminal: React.FC<GameTheoryTerminalProps> = ({
         </div>
 
         {/* Header */}
-        <div className="bg-[#D4CDC0] border-b-2 border-[#1A1A1A] px-4 py-2 flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-[#1A1A1A] rounded-full animate-pulse"></div>
-            <span className="text-[#1A1A1A] font-bold uppercase tracking-widest text-sm">
+        <div className="bg-[#D4CDC0] border-b-2 border-[#1A1A1A] px-3 py-1.5 md:px-4 md:py-2 flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-[#1A1A1A] rounded-full animate-pulse"></div>
+            <span className="text-[#1A1A1A] font-bold uppercase tracking-widest text-[10px] md:text-sm">
               THEORY MODULE // SYS V1.0
             </span>
           </div>
-          <div className="text-xs text-[#A8A295] uppercase font-bold tracking-widest bg-[#EAE5D9] px-2 py-0.5 border border-[#A8A295]">
+          <div className="text-[8px] md:text-xs text-[#A8A295] uppercase font-bold tracking-widest bg-[#EAE5D9] px-1.5 py-0.5 border border-[#A8A295]">
             STRAFFIN: ON
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 relative z-10">
+        <div className="p-3 md:p-6 relative z-10">
           
           {/* Status Bar */}
-          <div className="mb-6 border-b-2 border-[#1A1A1A] pb-2 flex justify-between">
-            <span className="text-[#A8A295] text-xs uppercase tracking-widest font-bold">
+          <div className="mb-4 md:mb-6 border-b-2 border-[#1A1A1A] pb-2 flex justify-between">
+            <span className="text-[#A8A295] text-[9px] md:text-xs uppercase tracking-widest font-bold">
               &gt; SYSTEM ACTIVE
             </span>
-            <span className="text-[#A8A295] text-xs uppercase tracking-widest font-bold bg-[#EAE5D9] px-2 rounded-sm">
+            <span className="text-[#A8A295] text-[9px] md:text-xs uppercase tracking-widest font-bold bg-[#EAE5D9] px-2 rounded-sm">
               REMAINING: [{remainingValues.length}]
             </span>
           </div>
 
           {/* Games Against Nature Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
             
             {/* Wald Method */}
-            <div className={`border-l-4 border-[#1A1A1A] pl-3 transition-opacity duration-150 ${calculationStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
-              <div className="flex items-center mb-1">
-                <div className="text-[10px] text-[#A8A295] uppercase tracking-widest font-bold">
+            <div className={`border-l-4 border-[#1A1A1A] pl-2 md:pl-3 transition-opacity duration-150 ${calculationStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="flex items-center mb-0.5 md:mb-1">
+                <div className="text-[9px] md:text-[10px] text-[#A8A295] uppercase tracking-widest font-bold">
                   [ WALD / MAXIMIN ]
                 </div>
-                <button onClick={() => toggleInfo('wald')} className="ml-2 text-[#FF5500] hover:text-[#1A1A1A] transition-colors">[ DETAILS ]</button>
+                <button onClick={() => toggleInfo('wald')} className="ml-2 text-[#FF5500] hover:text-[#1A1A1A] transition-colors text-[9px] md:text-[10px]">[ DETAILS ]</button>
               </div>
-              <div className="text-[#1A1A1A] font-extrabold text-2xl tracking-tight">
+              <div className="text-[#1A1A1A] font-extrabold text-xl md:text-2xl tracking-tight">
                 {displayedMetrics.waldValue !== undefined ? formatCurrency(displayedMetrics.waldValue) : '---'}
               </div>
-              <div className="text-[9px] text-[#A8A295] mt-1 uppercase font-bold">Absolute Floor</div>
+              <div className="text-[8px] md:text-[9px] text-[#A8A295] mt-0.5 md:mt-1 uppercase font-bold">Absolute Floor</div>
               {activeInfo === 'wald' && (
                 <div className="bg-[#D4CDC0] border border-dashed border-[#1A1A1A]/50 p-2 mt-2 text-[10px] md:text-xs text-[#1A1A1A] leading-relaxed font-sans">
                   ကံအဆိုးဆုံး အခြေအနေအတွက် တွက်ထားတဲ့ ဂဏန်းပါ။ ရှေ့ဆက်ကစားလို့ အဆိုးဆုံးဖြစ်သွားရင်တောင် အနည်းဆုံး ဒီလောက်တော့ သေချာပေါက် ရမယ်ဆိုတဲ့ အောက်ထစ်ပမာဏ (Absolute Floor) ပါ။
@@ -201,40 +201,40 @@ const GameTheoryTerminal: React.FC<GameTheoryTerminalProps> = ({
               )}
             </div>
 
-            {/* Laplace Method */}
-            <div className={`border-l-4 border-[#FF5500] pl-3 transition-opacity duration-150 ${calculationStep >= 3 ? 'opacity-100' : 'opacity-0'}`}>
-              <div className="flex items-center mb-1">
-                <div className="text-[10px] text-[#FF5500] uppercase tracking-widest font-bold">
-                  [ LAPLACE / EV ]
+            {/* Maximax Method */}
+            <div className={`border-l-4 border-[#1A1A1A] pl-2 md:pl-3 transition-opacity duration-150 ${calculationStep >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="flex items-center mb-0.5 md:mb-1">
+                <div className="text-[9px] md:text-[10px] text-[#A8A295] uppercase tracking-widest font-bold">
+                  [ MAXIMAX / OPTIMIST ]
                 </div>
-                <button onClick={() => toggleInfo('laplace')} className="ml-2 text-[#FF5500] hover:text-[#1A1A1A] transition-colors">[ DETAILS ]</button>
+                <button onClick={() => toggleInfo('maximax')} className="ml-2 text-[#FF5500] hover:text-[#1A1A1A] transition-colors text-[9px] md:text-[10px]">[ DETAILS ]</button>
               </div>
-              <div className="text-[#FF5500] font-extrabold text-2xl tracking-tight">
-                {displayedMetrics.laplaceValue !== undefined ? formatCurrency(displayedMetrics.laplaceValue) : '---'}
+              <div className="text-[#1A1A1A] font-extrabold text-xl md:text-2xl tracking-tight">
+                {displayedMetrics.maximaxValue !== undefined ? formatCurrency(displayedMetrics.maximaxValue) : '---'}
               </div>
-              <div className="text-[9px] text-[#A8A295] mt-1 uppercase font-bold">Statistical Average</div>
-              {activeInfo === 'laplace' && (
+              <div className="text-[8px] md:text-[9px] text-[#A8A295] mt-0.5 md:mt-1 uppercase font-bold">Pure Upside</div>
+              {activeInfo === 'maximax' && (
                 <div className="bg-[#D4CDC0] border border-dashed border-[#1A1A1A]/50 p-2 mt-2 text-[10px] md:text-xs text-[#1A1A1A] leading-relaxed font-sans">
-                  သင်္ချာသဘောအရ မျှော်မှန်းလို့ရတဲ့ ပျမ်းမျှပမာဏပါ။ ကျန်နေသေးတဲ့ သေတ္တာတွေထဲက ငွေတွေအကုန်ပေါင်းပြီး သေတ္တာအရေအတွက်နဲ့ စားထားတာဖြစ်လို့ ဂိမ်းရဲ့ လက်ရှိ 'အကြမ်းဖျင်းတန်ကြေး' လို့ မှတ်ယူနိုင်ပါတယ်။
+                  ကံအကောင်းဆုံး အခြေအနေအတွက် တွက်ထားတာပါ။ အကောင်းမြင်သမားတွေအတွက် အမြင့်ဆုံး ရနိုင်မယ့် ပမာဏ (Pure Upside) ကို ပြထားတာ ဖြစ်ပါတယ်။
                 </div>
               )}
             </div>
 
-            {/* Maximax Method */}
-            <div className={`border-l-4 border-[#1A1A1A] pl-3 transition-opacity duration-150 ${calculationStep >= 2 ? 'opacity-100' : 'opacity-0'}`}>
-              <div className="flex items-center mb-1">
-                <div className="text-[10px] text-[#A8A295] uppercase tracking-widest font-bold">
-                  [ MAXIMAX ]
+            {/* Laplace Method */}
+            <div className={`border-l-4 border-[#1A1A1A] pl-2 md:pl-3 transition-opacity duration-150 ${calculationStep >= 3 ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="flex items-center mb-0.5 md:mb-1">
+                <div className="text-[9px] md:text-[10px] text-[#A8A295] uppercase tracking-widest font-bold">
+                  [ LAPLACE / AVERAGE ]
                 </div>
-                <button onClick={() => toggleInfo('maximax')} className="ml-2 text-[#FF5500] hover:text-[#1A1A1A] transition-colors">[ DETAILS ]</button>
+                <button onClick={() => toggleInfo('laplace')} className="ml-2 text-[#FF5500] hover:text-[#1A1A1A] transition-colors text-[9px] md:text-[10px]">[ DETAILS ]</button>
               </div>
-              <div className="text-[#1A1A1A] font-extrabold text-2xl tracking-tight">
-                {displayedMetrics.maximaxValue !== undefined ? formatCurrency(displayedMetrics.maximaxValue) : '---'}
+              <div className="text-[#1A1A1A] font-extrabold text-xl md:text-2xl tracking-tight">
+                {displayedMetrics.laplaceValue !== undefined ? formatCurrency(displayedMetrics.laplaceValue) : '---'}
               </div>
-              <div className="text-[9px] text-[#A8A295] mt-1 uppercase font-bold">Theoretical Ceiling</div>
-              {activeInfo === 'maximax' && (
+              <div className="text-[8px] md:text-[9px] text-[#A8A295] mt-0.5 md:mt-1 uppercase font-bold">Expected Value</div>
+              {activeInfo === 'laplace' && (
                 <div className="bg-[#D4CDC0] border border-dashed border-[#1A1A1A]/50 p-2 mt-2 text-[10px] md:text-xs text-[#1A1A1A] leading-relaxed font-sans">
-                  အကောင်းဆုံး အခြေအနေကို မျှော်မှန်းထားတဲ့ ဂဏန်းပါ။ သင်သာ ကံအကောင်းဆုံးဖြစ်ပြီး အကြီးဆုံးသေတ္တာကို ရခဲ့မယ်ဆိုရင် ရနိုင်မယ့် အမြင့်ဆုံးပမာဏပါ။
+                  ကျန်နေတဲ့ သေတ္တာအားလုံးရဲ့ ပျမ်းမျှတန်ဖိုး (Expected Value) ဖြစ်ပါတယ်။ Banker ဆီက ကမ်းလှမ်းချက်ဟာ ဒီဂဏန်းထက် များနေရင် လက်ခံသင့်ပါတယ်။
                 </div>
               )}
             </div>
@@ -286,36 +286,36 @@ const GameTheoryTerminal: React.FC<GameTheoryTerminalProps> = ({
           {/* Banker Offer Comparison */}
           {bankerOffer !== null && bankerOffer > 0 && (
             <div className="mb-6">
-              <div className="text-[10px] text-[#1A1A1A]/60 font-bold uppercase tracking-widest mb-2">
+              <div className="text-[9px] md:text-[10px] text-[#1A1A1A]/60 font-bold uppercase tracking-widest mb-2">
                 &gt; LIVE SPREAD ANALYSIS
               </div>
-              <div className="flex flex-col md:flex-row gap-4 bg-[#EAE5D9] border-2 border-[#1A1A1A] p-4">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 bg-[#EAE5D9] border-2 border-[#1A1A1A] p-3 md:p-4">
                 <div className="flex-1">
-                  <div className="text-[10px] text-[#1A1A1A]/50 font-bold uppercase bg-[#D4CDC0] inline-block px-1 border border-[#A8A295] mb-1">Banker Bid</div>
-                  <div className="text-[#1A1A1A] text-2xl font-extrabold tracking-tighter">
+                  <div className="text-[8px] md:text-[10px] text-[#1A1A1A]/50 font-bold uppercase bg-[#D4CDC0] inline-block px-1 border border-[#A8A295] mb-1">Banker Bid</div>
+                  <div className="text-[#1A1A1A] text-xl md:text-2xl font-extrabold tracking-tighter">
                     {formatCurrency(bankerOffer)}
                   </div>
                 </div>
                 
-                <div className="hidden md:flex flex-col justify-center items-center px-4">
+                <div className="hidden sm:flex flex-col justify-center items-center px-2 md:px-4">
                   <div className="h-full w-0.5 bg-[#1A1A1A]"></div>
                 </div>
 
                 <div className="flex-1">
-                  <div className="text-[10px] text-[#1A1A1A]/50 font-bold uppercase mb-1">Delta vs CE</div>
-                  <div className={`text-xl font-extrabold tracking-tighter ${bankerOffer >= metrics.certaintyEquivalent ? 'text-[#00873E]' : 'text-[#dc2626]'}`}>
+                  <div className="text-[8px] md:text-[10px] text-[#1A1A1A]/50 font-bold uppercase mb-1">Delta vs CE</div>
+                  <div className={`text-lg md:text-xl font-extrabold tracking-tighter ${bankerOffer >= metrics.certaintyEquivalent ? 'text-[#00873E]' : 'text-[#dc2626]'}`}>
                     {bankerOffer >= metrics.certaintyEquivalent ? '+' : ''}
                     {formatCurrency(bankerOffer - metrics.certaintyEquivalent)}
                   </div>
                 </div>
 
-                <div className="hidden md:flex flex-col justify-center items-center px-4">
+                <div className="hidden sm:flex flex-col justify-center items-center px-2 md:px-4">
                   <div className="h-full w-0.5 bg-[#1A1A1A]"></div>
                 </div>
 
                 <div className="flex-1">
-                  <div className="text-[10px] text-[#1A1A1A]/50 font-bold uppercase mb-1">Delta vs EV</div>
-                  <div className={`text-xl font-extrabold tracking-tighter ${bankerOffer >= metrics.laplaceValue ? 'text-[#00873E]' : 'text-[#dc2626]'}`}>
+                  <div className="text-[8px] md:text-[10px] text-[#1A1A1A]/50 font-bold uppercase mb-1">Delta vs EV</div>
+                  <div className={`text-lg md:text-xl font-extrabold tracking-tighter ${bankerOffer >= metrics.laplaceValue ? 'text-[#00873E]' : 'text-[#dc2626]'}`}>
                     {bankerOffer >= metrics.laplaceValue ? '+' : ''}
                     {formatCurrency(bankerOffer - metrics.laplaceValue)}
                   </div>
